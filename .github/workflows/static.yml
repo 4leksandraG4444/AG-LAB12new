@@ -41,6 +41,7 @@ jobs:
         run: |
           cd laboratorium12
           npm install
+          npm install date-fns --save
 
       - name: Build laboratorium12
         run: |
