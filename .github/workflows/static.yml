@@ -42,6 +42,7 @@ jobs:
           cd laboratorium12
           npm install
           npm install date-fns --save
+          npm install @supabase/supabase-js
 
       - name: Build laboratorium12
         run: |
