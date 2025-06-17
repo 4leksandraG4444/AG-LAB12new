@@ -39,12 +39,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd laboratorium10
+          cd laboratorium12
           npm install
 
-      - name: Build laboratorium10
+      - name: Build laboratorium12
         run: |
-          cd laboratorium10
+          cd laboratorium12
           npm run build -- --base=/AG-LAB12new/
 
       - name: Setup Pages
@@ -53,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: laboratorium10/dist
+          path: laboratorium12/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
