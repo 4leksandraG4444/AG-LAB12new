@@ -45,7 +45,7 @@ jobs:
       - name: Build laboratorium10
         run: |
           cd laboratorium10
-          npm run build -- --base=/AG-LAB12/
+          npm run build -- --base=/AG-LAB12new/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
