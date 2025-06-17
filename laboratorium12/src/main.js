@@ -1,127 +1,77 @@
 import './style.css'
-import { format } from 'date-fns';
+import { setupCounter } from './counter.js'
+import { createClient } from '@supabase/supabase-js'
+import { format } from 'date-fns'
 
 const API_URL = 'https://lxqwjzeoojicwmmkjdjf.supabase.co';
 const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4cXdqemVvb2ppY3dtbWtqZGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4Mjk0MTIsImV4cCI6MjA2NTQwNTQxMn0.f4ij3T_cDr0XvHFGeTYNmj3AH2w_aGq4BKWq6iiDZz0';
+const supabase = createClient(API_URL, API_KEY)
+
+const articleContainer = document.getElementById('articles')
+const articleOrder = document.getElementById('sort-select')
+const addArticleForm = document.getElementById('addArticle')
 
 document.querySelector('#app').innerHTML = `
-  <h1>Laboratorium 12</h1>
-
-  <div id="sort-field">
-  <label for="sort-select" class="select-header">sortuj według:</label>
-  <select id="sort-select">
-    <option value="created_at.asc">po dacie rosnąco</option>
-    <option value="created_at.desc" selected>po dacie malejąco</option>
-    <option value="title.asc">po nazwie alfabetycznie</option>
-  </select>
+  <div>
+    <h1 class="text-2xl font-bold text-primary">Hello Vite!</h1>
+    <div class="card">
+      <button id="counter" type="button" class="bg-blue-300 p-4"></button>
+    </div>
   </div>
-
-  <ul id="articles-list"></ul>
-
-  <h2 id="add-article-header">dodaj nowy artykuł</h2>
-    <form id="article-form">
-      <label>
-        tytuł:
-        <input type="text" name="title" placeholder="tytuł" required />
-      </label>
-      <label>
-        podtytuł:
-        <input type="text" name="subtitle" placeholder="podtytuł" required />
-      </label>
-      <label>
-        autor:
-        <input type="text" name="author" placeholder="autor" required />
-      </label>
-      <label>
-        treść artykułu:
-        <textarea name="content" placeholder="treść artykułu" required></textarea>
-      </label>
-      <label>
-        data utworzenia:
-        <input type="date" name="created_at" placeholder="data utworzenia" />
-      </label>
-      <button type="submit" class="submit-button">dodaj artykuł</button>
-    </form>`;
-
-const sortSelect = document.getElementById('sort-select');
-sortSelect.addEventListener('change', () => {
-  fetchArticles();
-});
+`
+setupCounter(document.querySelector('#counter'))
 
 const fetchArticles = async () => {
-  const sortSelect = document.getElementById('sort-select');
-  const order = sortSelect ? sortSelect.value : 'created_at.desc';
+  const sortDirection = articleOrder ? articleOrder.value : 'created_at.desc'
+  const [column, direction] = sortDirection.split('.')
 
-  try {
-    const response = await fetch(
-      `${API_URL}?order=${order}`,
-      {
-        headers: {
-          apiKey: API_KEY,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+  const { data } = await supabase.from('article').select().order(column, { ascending: direction === 'asc' })
 
-    const data = await response.json();
-    showArticles(data);
-  } catch (error) {
-    console.error('Fetch error:', error);
-  }
+  const html = data.reduce((acc, cur) => {
+    const formatedDate = format(cur.created_at, "dd/MM/yyyy")
+
+    const articleTemplate = `
+      <li class="py-2">
+        <p>Title: ${cur.title}</p>
+        <p>Subtitle: ${cur.subtitle}</p>
+        <p>Author: ${cur.author}</p>
+        <p>Date: ${formatedDate}</p>
+        <p>Content: ${cur.content}</p>
+      </li>
+    `
+    return acc + articleTemplate
+  }, '')
+
+  articleContainer.innerHTML = html
 };
 
-function showArticles(articles) {
-  const list = document.getElementById('articles-list');
-  list.innerHTML = '';
+document.addEventListener('DOMContentLoaded', () => {
+  fetchArticles();
 
-  articles.forEach(article => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <h2>${article.title}</h2>
-      <h3>${article.subtitle}</h3>
-      <p><address>autor: ${article.author}</address></p>
-      <p><time>data: ${format(new Date(article.created_at), 'dd-MM-yyyy')}</time></p>
-      <p>${article.content}</p>
-    `;
-    list.appendChild(li);
-  });
-}
+  addArticleForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-const form = document.getElementById('article-form');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    const title = e.target.title.value;
+    const subtitle = e.target.subtitle.value;
+    const author = e.target.author.value;
+    const content = e.target.content.value;
+    const createdDate = e.target.created_at.value;
+    const created_at = createdDate ? new Date(createdDate).toISOString() : "";
 
-  const formData = new FormData(form);
-  const createdAtValue = formData.get('created_at');
-  const newArticle = {
-    title: formData.get('title'),
-    subtitle: formData.get('subtitle'),
-    author: formData.get('author'),
-    content: formData.get('content'),
-    created_at: createdAtValue ? new Date(createdAtValue).toISOString() : new Date().toISOString(),
-  };
-
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        apiKey: API_KEY,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation'
-      },
-      body: JSON.stringify(newArticle),
-    });
-
-    if (!response.ok) {
-      throw new Error (`Status: ${response.status}`)
+    const newArticle = {
+      title,
+      subtitle,
+      author,
+      content,
+      ...(created_at ? { created_at } : {}),
     }
 
-    fetchArticles();
+    if (!title || !subtitle || !author || !content) return
 
-    form.reset();
-  } catch (error) {
-    console.error('Fetch error:', error)
-  }
-});
+    await supabase.from('article').insert(newArticle)
+    addArticleForm.reset()
+    fetchArticles()
+  })
 
-fetchArticles();
+  articleOrder.addEventListener('change', fetchArticles)
+})
