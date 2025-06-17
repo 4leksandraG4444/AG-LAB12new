@@ -43,6 +43,7 @@ jobs:
           npm install
           npm install date-fns --save
           npm install @supabase/supabase-js
+          npm install -D @tailwindcss/vite tailwindcss postcss autoprefixer
 
       - name: Build laboratorium12
         run: |
