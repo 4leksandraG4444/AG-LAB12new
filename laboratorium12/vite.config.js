@@ -1,8 +1,23 @@
 import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+
 export default defineConfig({
+  plugins: [react()],
   base: '/AG-LAB12new/',
-  plugins: [
-    tailwindcss(),
-  ],
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      external: [
+        '@supabase/supabase-js',
+        'date-fns'
+      ],
+    }
+  },
+  optimizeDeps: {
+    include: [
+      '@supabase/supabase-js',
+      'date-fns'
+    ]
+  }
 })
