@@ -1,6 +1,9 @@
 import './style.css'
 import { format } from 'date-fns';
 
+const API_URL = 'https://lxqwjzeoojicwmmkjdjf.supabase.co';
+const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4cXdqemVvb2ppY3dtbWtqZGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4Mjk0MTIsImV4cCI6MjA2NTQwNTQxMn0.f4ij3T_cDr0XvHFGeTYNmj3AH2w_aGq4BKWq6iiDZz0';
+
 document.querySelector('#app').innerHTML = `
   <h1>Laboratorium 12</h1>
 
@@ -39,9 +42,6 @@ document.querySelector('#app').innerHTML = `
       </label>
       <button type="submit" class="submit-button">dodaj artykuł</button>
     </form>`;
-
-const API_URL = 'https://lxqwjzeoojicwmmkjdjf.supabase.co';
-const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4cXdqemVvb2ppY3dtbWtqZGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4Mjk0MTIsImV4cCI6MjA2NTQwNTQxMn0.f4ij3T_cDr0XvHFGeTYNmj3AH2w_aGq4BKWq6iiDZz0';
 
 const sortSelect = document.getElementById('sort-select');
 sortSelect.addEventListener('change', () => {
